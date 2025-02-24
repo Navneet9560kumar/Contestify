@@ -1,0 +1,36 @@
+[{
+  "id": 1,
+  "title": "2698. Find the Punishment Number of an Integer",
+  "difficulty": "Medium",
+  "description": "Given a positive integer n, return the punishment number of n. The decimal representation of i * i can be partitioned into contiguous substrings such that the sum of the integer values of these substrings equals i.",
+  "example": "Example 1:\nInput: n = 10\nOutput: 182\nExplanation:\n- 1 since 1 * 1 = 1\n- 9 since 9 * 9 = 81 and 81 can be partitioned into 8 and 1, sum = 9\n- 10 since 10 * 10 = 100, partitioned into 10 and 0, sum = 10\nHence, the punishment number of 10 is 1 + 81 + 100 = 182"
+},
+{
+  "id": 2,
+  "title": "1234. Find the Sum of Unique Elements",
+  "difficulty": "Easy",
+  "description": "Given an array of integers, return the sum of all unique elements.",
+  "example": "Example 1:\nInput: nums = [1,2,3,2]\nOutput: 4\nExplanation: The unique elements are 1 and 3, sum = 4."
+},
+{
+  "id": 3,
+  "title": "238. Product of Array Except Self",
+  "difficulty": "Medium",
+  "description": "Given an integer array nums, return an array answer such that answer[i] is equal to the product of all the elements of nums except nums[i]. The product of any prefix or suffix of nums is guaranteed to fit in a 32-bit integer.",
+  "example": "Example 1:\nInput: nums = [1,2,3,4]\nOutput: [24,12,8,6]"
+},
+{
+  "id": 4,
+  "title": "543. Diameter of Binary Tree",
+  "difficulty": "Easy",
+  "description": "Given the root of a binary tree, return the length of the diameter of the tree. The diameter of a binary tree is the length of the longest path between any two nodes in a tree.",
+  "example": "Example 1:\nInput: root = [1,2,3,4,5]\nOutput: 3"
+},
+{
+  "id": 5,
+  "title": "128. Longest Consecutive Sequence",
+  "difficulty": "Hard",
+  "description": "Given an unsorted array of integers nums, return the length of the longest consecutive elements sequence.",
+  "example": "Example 1:\nInput: nums = [100,4,200,1,3,2]\nOutput: 4\nExplanation: The longest consecutive sequence is [1,2,3,4]."
+}
+]
