@@ -154,13 +154,13 @@ const Code = () => {
                 <p>{selectedProblem.description}</p>
                 <b>Example:</b>
                 <p>
-                  <b>Input:</b> {selectedProblem.example.input}
+                  <b>Input:</b> {selectedProblem.example.Input}
                 </p>
                 <p>
-                  <b>Output:</b> {selectedProblem.example.output}
+                  <b>Output:</b> {selectedProblem.example.Output}
                 </p>
                 <p>
-                  <b>Explanation:</b> {selectedProblem.example.explanation}
+                  <b>Explanation:</b> {selectedProblem.example.Explanation}
                 </p>
               </div>
             )}
