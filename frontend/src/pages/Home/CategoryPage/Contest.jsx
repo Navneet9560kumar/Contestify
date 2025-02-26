@@ -38,13 +38,6 @@ const contestCategories = [
     icon: "📱",
     link: "/contest/mobiledev",
   },
-  {
-    title: "Data Structures Contest",
-    timeLeft: "Completed",
-    description: "Master Data Structures.",
-    participants: 180,
-    link: "/contest/contestDetails",  // Add this link
-  },
   
 ];
 

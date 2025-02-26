@@ -58,7 +58,7 @@ const DSAChallenge = () => {
           </div>
           <button
             className="mt-4 px-6 py-3 bg-green-600 text-white rounded-full shadow-md hover:bg-green-700 transition"
-            onClick={() => navigate("/contestrules")}
+            onClick={() => navigate("/contest/dsa/contestrules")}
           >
             Start Challenge
           </button>
