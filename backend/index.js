@@ -1,56 +1,51 @@
 import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import path from "path";
-
-import { connectDB } from "./db/connectDB.js";
-
-import authRoutes from "./routes/auth.route.js";
-
-dotenv.config();
+import axios from "axios";
+import cors from "cors"; // Allow frontend requests
 
 const app = express();
-const PORT = process.env.PORT || 5000;
-const __dirname = path.resolve();
+app.use(express.json());
+app.use(cors());
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+const JUDGE0_API = "http://localhost:2358"; 
 
-app.use(express.json()); // allows us to parse incoming requests:req.body
-app.use(cookieParser()); // allows us to parse incoming cookies
+app.post("/api/submit-code", async (req, res) => {
+  try {
+    const {
+      language_id,
+      source_code,
+      stdin,
+      expected_output,
+      cpu_time_limit,
+      memory_limit,
+    } = req.body;
 
-app.use("/api/auth", authRoutes);
+    // Send Code to Judge0
+    const submission = await axios.post(`${JUDGE0_API}/submissions`, {
+      language_id,
+      source_code,
+      stdin,
+      expected_output, // Expected output
+      cpu_time_limit,
+      memory_limit,
+    });
 
-if (process.env.NODE_ENV === "production") {
-	app.use(express.static(path.join(__dirname, "/frontend/dist")));
+    const token = submission.data.token;
 
-	app.get("*", (req, res) => {
-		res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
-	});
-}
-app.post("/submit",async(req,res)=>{
-	const{code,language_id,stdin}=req.body;
-	try{
-		const response =await axios.post(`${JUDGE0_URL}/submissions`,{
-			language_id,
-			source_code:code,
-			stdin,},{params:{base64_encoded:false,wait:false}});
-	}catch(error){
-		res.status(500).json({error:"submission failed"});
-	}
-})
-// Route to fetch result
-app.get("/result/:token", async (req, res) => {
-	const token = req.params.token;
+    // Wait for execution & Fetch Result
+    let result;
+    while (true) {
+      result = await axios.get(`${JUDGE0_API}/submissions/${token}`);
+      if (result.data.status.id >= 3) break; // 3 means execution complete
+      await new Promise((r) => setTimeout(r, 1000)); // Wait before retry
+    }
 
-	try {
-			const response = await axios.get(`${JUDGE0_URL}/submissions/${token}`);
-			return res.json(response.data);
-	} catch (error) {
-			return res.status(500).json({ error: "Failed to fetch result" });
-	}
+    //  Send response to frontend
+    res.json(result.data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Execution failed" });
+  }
 });
-app.listen(PORT, () => {
-	connectDB();
-	console.log("Server is running on port: ", PORT);
-});
+
+const PORT = 5000;
+app.listen(PORT, () => console.log(`✅ Backend running on port ${PORT}`));
