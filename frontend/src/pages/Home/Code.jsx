@@ -1,9 +1,10 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Split from "react-split";
 import { ArrowLeft, User, RefreshCw, Play, Upload } from "lucide-react";
 import Editor from "@monaco-editor/react";
-import problems from "../../../../backend/utils/problems";
+import problems from "../../../../backend/utils/problems.json";
 
 const languages = [
   { label: "C", value: "c", id: 50 },
@@ -37,28 +38,62 @@ const Code = () => {
   const [output, setOutput] = useState("");
   const [randomProblems, setRandomProblems] = useState([]);
   const [selectedProblem, setSelectedProblem] = useState(null);
-  const [sidebar, setSidebar] = useState(false);
-
+  const [sidebar, setSidebar] = useState(true);
+  const [switchCount, setSwitchCount] = useState(0);
   const getRandomProblems = () => {
     let shuffled = [...problems].sort(() => 0.5 - Math.random());
     setRandomProblems(shuffled.slice(0, 4));
   };
 
   useEffect(() => {
-    getRandomProblems();
-    console.log(code);
-    console.log(selectedLang);
-  }, [selectedLang]);
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        setSwitchCount((prev) => prev + 1);
+      }
+    };
 
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    if(switchCount==1) alert("Don't switch tab otherwise your contest will be autoSubmitted !");
+    if (switchCount > 2) {
+      navigate("/submit"); // Redirect after 2+ switches
+    }
+  }, [switchCount, navigate]);
+  
+  useEffect(() => {
+    getRandomProblems();
+    const disableCopyPaste = (event) => {
+      event.preventDefault(); //prevent default option(copy,paste,right-click)
+    };
+    document.addEventListener("contextmenu", disableCopyPaste);
+    document.addEventListener("copy", disableCopyPaste);
+    document.addEventListener("paste", disableCopyPaste);
+
+    return () => {
+      document.removeEventListener("contextmenu", disableCopyPaste);
+      document.removeEventListener("copy", disableCopyPaste);
+      document.removeEventListener("paste", disableCopyPaste);
+    };
+  }, [selectedLang]);
   const runCode = async () => {
+    if (!selectedProblem) {
+      setOutput("Please select a problem first !");
+      return;
+    }
     const selectedLanguage = languages.find(
       (lang) => lang.value === selectedLang
     );
     const requestData = {
       language_id: selectedLanguage?.id || 71,
       source_code: code,
-      stdin: "nums=[1,-3,2,3,-4]",
-      expected_output: "5",
+      stdin: selectedProblem.example.Input || "",
+      expected_output: selectedProblem.example.Output || "",
       cpu_time_limit: 2,
       memory_limit: 128000,
     };
@@ -71,10 +106,10 @@ const Code = () => {
       });
 
       const result = await response.json();
-      setOutput(result.stdout || `Error:${result.stderr}`);
+      setOutput(result.stdout || `Error: ${result.stderr}`);
       console.log("Judge0 Response:", result);
     } catch (error) {
-      setOutput(`Request failed:${error.message || JSON.stringify(error)}`);
+      setOutput(`Request failed: ${error.message || JSON.stringify(error)}`);
       console.error("Error submitting code:", error);
     }
   };
@@ -142,7 +177,16 @@ const Code = () => {
             ))}
           </div>
         ) : (
-          <div className="bg-[#262626] p-4 overflow-auto">
+          <div
+            className="bg-[#262626] p-4 overflow-auto"
+            style={{
+              userSelect: "none",
+              pointerEvents: "none",
+            }}
+            onCopy={(e) => e.preventDefault()}
+            onCut={(e) => e.preventDefault()}
+            onContextMenu={(e) => e.preventDefault()}
+          >
             {selectedProblem && (
               <div className="mt-4 text-lg">
                 <h1 className="text-3xl font-bold mb-3">
